@@ -38,6 +38,9 @@ employeeStart = () => {
 .then(function(outcome){
     switch(outcome.suggestion){
         case"Add Department":
+        addDepartment();
+        break;
+
 
     }
 })
@@ -112,4 +115,57 @@ addEmployee = () => {
             employeeStart()
         });
     });
+}
+
+updateCurrentEmployee = () => {
+    inquirer.prompt([
+    {
+        type: "input",
+        message: "Which employee would you like to update?",
+        name: "updateEmployee"
+    },
+    {
+        type: "input",
+        message: "What role would you like to update?",
+        name: "updateRole"
+    }
+    ]).then(function(answer){
+        connection.query("UPDATE employee SET role_id=?" [answer.updateEmployee, answer.updateRole], function(err,res){
+            if (err) throw err;
+            console.table(res)
+            employeeStart()
+        });
+    });
+}
+
+viewDepartment = () => {
+
+    connection.query("UPDATE employee SET role_id=?" [answer.updateEmployee, answer.updateRole], function(err,res){
+            if (err) throw err;
+            console.table(res)
+            employeeStart();
+        });
+}
+
+viewRoles = () => {
+    
+    connection.query("UPDATE employee SET role_id=?" [answer.updateEmployee, answer.updateRole], function(err,res){
+            if (err) throw err;
+            console.table(res)
+            employeeStart();
+        });
+}
+
+viewEmployees = () => {
+    
+    connection.query("UPDATE employee SET role_id=?" [answer.updateEmployee, answer.updateRole], function(err,res){
+            if (err) throw err;
+            console.table(res)
+            employeeStart();
+        });
+}
+
+quit = () => {
+    connection.end
+    process.exit();
 }
