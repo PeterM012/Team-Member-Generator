@@ -53,8 +53,8 @@ addDepartment = () => {
             if (err) throw err;
             console.table(res)
             employeeStart()
-        })
-    })
+        });
+    });
 }
 
 addRole = () => {
@@ -71,14 +71,45 @@ addRole = () => {
     },
     {
         type: "input",
-        message: "What is ID for this ?",
+        message: "What department does the role belong to?",
         name: "dID"
     }
     ]).then(function(answer){
-        connection.query("INSERT INTO department (name) VALUES (?)", [answer.dName], function(err,res){
+        connection.query("INSERT INTO role (title,salary,department_id) VALUES (?,?,?)", [answer.roleType, answer.yearlySalary, answer.dID,], function(err,res){
             if (err) throw err;
             console.table(res)
             employeeStart()
-        })
-    })
+        });
+    });
+}
+
+addEmployee = () => {
+    inquirer.prompt([
+    {
+        type: "input",
+        message: "What is the employees first name?",
+        name: "firstName"
+    },
+    {
+        type: "input",
+        message: "What is the employees last name?",
+        name: "lastName"
+    },
+    {
+        type: "input",
+        message: "What is the new employee's role?",
+        name: "newRole"
+    },
+    {
+        type: "input",
+        message: "Who is the employee's manager?",
+        name: "deptManager"
+    }
+    ]).then(function(answer){
+        connection.query("INSERT INTO employee_name (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", [answer.firstName, answer.lastName, answer.newRole, answer.deptManager,], function(err,res){
+            if (err) throw err;
+            console.table(res)
+            employeeStart()
+        });
+    });
 }
