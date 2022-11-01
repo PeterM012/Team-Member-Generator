@@ -54,8 +54,8 @@ employeeStart = () => {
         case"View Employees":
         viewEmployees ();
         break;
-        case"Update Employees":
-        viewEmployees ();
+        case"Update employee Role":
+        updateCurrentEmployee();
         break;
     }
   });
@@ -69,7 +69,7 @@ addDepartment = () => {
     }).then(function(answer){
         connection.query("INSERT INTO department (name) VALUES (?)", answer.dName, function(err,res){
             if (err) throw err;
-            console.table(res)
+            console.log("added to database")
             employeeStart()
         });
     });
@@ -104,7 +104,7 @@ addRole = () => {
     ]).then(function(answer){
         connection.query("INSERT INTO role (title,departments,salary) VALUES (?,?,?)", [answer.roleType, answer.dID, answer.yearlySalary,], function(err,res){
             if (err) throw err;
-            console.table(res)
+            console.log("Added " + answer.roleType + " added to database")
             employeeStart()
         });
     });
@@ -112,9 +112,12 @@ addRole = () => {
 
 addEmployee = () => {
     let array = [];
-    connection.query("SELECT title from role", function(err, res){
+    connection.query("SELECT * from role", function(err, res){
         for(const i of res) {
-            array.push(i.title);
+            array.push({
+                name: i.title,
+                value: i.id
+            });
         }
     });
 
@@ -151,26 +154,48 @@ addEmployee = () => {
     ]).then(function(answer){
         connection.query("INSERT INTO employee_name (first_name, last_name, role_id, manager_name) VALUES (?,?,?,?)", [answer.firstName, answer.lastName, answer.newRole, answer.deptManager,], function(err,res){
             if (err) throw err;
-            console.table(res)
+            console.log("Added " + answer.firstName + answer.lastName + " added to database")
             employeeStart()
         });
     });
 }
 
-updateCurrentEmployee = () => {
+async function updateCurrentEmployee() {
+    let array = [];
+    let [rows] = await connection.promise().query("SELECT * from employee_name");
+    
+    for(const i of rows) {
+        array.push({
+            name: i.first_name + " " + i.last_name,
+            value: i.id
+        });
+    }
+    
+    let array2 = [];
+    let [rows2] = await connection.promise().query("SELECT * from role");
+    
+    for(const i of rows2) {
+        array2.push({
+            name: i.title,
+            value: i.id
+        });
+    }
+
     inquirer.prompt([
     {
         type: "list",
+        choices: array,
         message: "Which employee would you like to update?",
         name: "updateEmployee"
     },
     {
         type: "list",
+        choices: array2,
         message: "What role would you like to update?",
         name: "updateRole"
     }
     ]).then(function(answer){
-        connection.query("UPDATE employee SET role_id=?" [answer.updateEmployee, answer.updateRole], function(err,res){
+        connection.query("UPDATE employee_name SET role_id = ? WHERE employee_name.id = ?", [answer.updateRole, answer.updateEmployee], function(err,res){
             if (err) throw err;
             console.table(res)
             employeeStart()
@@ -197,7 +222,7 @@ let query = "SELECT * from role"
 }
 
 viewEmployees = () => {
-let query = "SELECT * from employee_name"    
+let query = "SELECT * from employee_name JOIN role ON employee_name.role_id = role.id"     
     connection.query(query, function(err,res){
             if (err) throw err;
             console.table(res)
