@@ -57,6 +57,8 @@ employeeStart = () => {
         case"Update employee Role":
         updateCurrentEmployee();
         break;
+        case"Exit":
+        quit();
     }
   });
 }
