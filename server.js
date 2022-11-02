@@ -1,10 +1,14 @@
+// Dependencies
 const mysql2 = require('mysql2');
 const cTable = require("console.table");
 const inquirer = require("inquirer");
 
+// Connect to database
 const connection = mysql2.createConnection({
     host: "localhost",
+    // MySQL username,
     user: "root",
+    // MySQL password
     password: "password",
     database: "employee_info_list_db"
 },
@@ -15,7 +19,7 @@ connection.connect(function(err){
     employeeStart();
 });
 
-
+//Prompts ask in the terminal
 employeeStart = () => {
     inquirer
     .prompt({
@@ -34,6 +38,7 @@ employeeStart = () => {
      name: "suggestion"
     })
 
+// used a switch case to call on the function needed when choice was selected/entered    
 .then(function(outcome){
     switch(outcome.suggestion){
         case"Add Department":
@@ -62,7 +67,7 @@ employeeStart = () => {
     }
   });
 }
-
+//adds new department to the database
 addDepartment = () => {
     inquirer.prompt({
         type: "input",
@@ -76,15 +81,17 @@ addDepartment = () => {
         });
     });
 }
-
+//adds new role to the database
 addRole = () => {
     let array = [];
     connection.query("SELECT name from department", function(err, res){
+        //Loop adds one or more elements to the end of an array and returns the new length of the array.
         for(const i of res) {
             array.push(i.name);
         }
     });
 
+//Prompts ask in the terminal
     inquirer.prompt([
     {
         type: "input",
@@ -112,9 +119,11 @@ addRole = () => {
     });
 }
 
+//adds new employee to the database
 addEmployee = () => {
     let array = [];
     connection.query("SELECT * from role", function(err, res){
+        //Loop adds one or more elements to the end of an array and returns the new length of the array.
         for(const i of res) {
             array.push({
                 name: i.title,
@@ -129,7 +138,7 @@ addEmployee = () => {
             array2.push(i.manager_name);
         }
     });
-
+//Prompts ask in the terminal
     inquirer.prompt([
     {
         type: "input",
@@ -164,6 +173,7 @@ addEmployee = () => {
 
 async function updateCurrentEmployee() {
     let array = [];
+    // Query database
     let [rows] = await connection.promise().query("SELECT * from employee_name");
     
     for(const i of rows) {
@@ -174,6 +184,7 @@ async function updateCurrentEmployee() {
     }
     
     let array2 = [];
+    // Query database
     let [rows2] = await connection.promise().query("SELECT * from role");
     
     for(const i of rows2) {
@@ -182,7 +193,7 @@ async function updateCurrentEmployee() {
             value: i.id
         });
     }
-
+//Prompts ask in the terminal
     inquirer.prompt([
     {
         type: "list",
@@ -197,6 +208,7 @@ async function updateCurrentEmployee() {
         name: "updateRole"
     }
     ]).then(function(answer){
+        // Query database
         connection.query("UPDATE employee_name SET role_id = ? WHERE employee_name.id = ?", [answer.updateRole, answer.updateEmployee], function(err,res){
             if (err) throw err;
             console.table(res)
@@ -206,6 +218,7 @@ async function updateCurrentEmployee() {
 }
 
 viewDepartment = () => {
+    // Query database
 let query = "SELECT * from department"
     connection.query(query, function(err,res){
             if (err) throw err;
@@ -215,6 +228,7 @@ let query = "SELECT * from department"
 }
 
 viewRoles = () => {
+    // Query database
 let query = "SELECT * from role"
     connection.query(query, function(err,res){
             if (err) throw err;
@@ -224,6 +238,7 @@ let query = "SELECT * from role"
 }
 
 viewEmployees = () => {
+    // Query database
 let query = "SELECT * from employee_name JOIN role ON employee_name.role_id = role.id"     
     connection.query(query, function(err,res){
             if (err) throw err;
